@@ -9,8 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Toggle } from "@/components/ui/toggle"
+import { useToast } from "@/hooks/use-toast"
 
 export default function WaitlistPage() {
+  const { toast } = useToast()
+  const [typeError, setTypeError] = useState(false)
   const [waitlistData, setWaitlistData] = useState({
     type: "",
     name: "",
@@ -19,8 +22,34 @@ export default function WaitlistPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!waitlistData.type) {
+      setTypeError(true)
+      toast({
+        title: "Error",
+        description: "Please select whether you're a sublessor or sublessee.",
+        duration: 5000,
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
     console.log("Submitted data:", waitlistData)
     // Here you would typically send the data to your backend
+
+    // Show success notification
+    toast({
+      title: "Success!",
+      description: "Your details have been added to our waitlist.",
+      duration: 5000,
+      className: "bg-green-500 text-white",
+    })
+
+    // Reset the form
+    setWaitlistData({
+      type: "",
+      name: "",
+      email: "",
+    })
+    setTypeError(false)
   }
 
   return (
@@ -33,8 +62,8 @@ export default function WaitlistPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Label htmlFor="type" className="text-center block text-xl">
-                I am a:
+              <Label htmlFor="type" className={`text-center block text-xl ${typeError ? "text-red-500" : ""}`}>
+                I am a: <span className="text-red-500">*</span>
               </Label>
               <div className="grid grid-cols-2 gap-8">
                 <div className="flex flex-col items-center gap-4">
@@ -50,8 +79,9 @@ export default function WaitlistPage() {
                   </div>
                   <Toggle
                     pressed={waitlistData.type === "sublessee"}
-                    onPressedChange={() => setWaitlistData({ ...waitlistData, type: "sublessee" })}
-                    className="data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md"
+                    onPressedChange={() => {setWaitlistData({ ...waitlistData, type: "sublessee" }); setTypeError(false)}}
+                    className={`data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md
+                    ${typeError ? "border-red-500 border-2" : ""}`}
                   >
                     Sublessee
                   </Toggle>
@@ -69,17 +99,19 @@ export default function WaitlistPage() {
                   </div>
                   <Toggle
                     pressed={waitlistData.type === "sublessor"}
-                    onPressedChange={() => setWaitlistData({ ...waitlistData, type: "sublessor" })}
-                    className="data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md"
+                    onPressedChange={() => {setWaitlistData({ ...waitlistData, type: "sublessor" }); setTypeError(false)}}
+                    className={`data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md
+                    ${typeError ? "border-red-500 border-2" : ""}`}
                   >
                     Sublessor
                   </Toggle>
                 </div>
               </div>
+              {typeError && <p className="text-red-500 text-center">Please select a type</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="name" className="text-lg">
-                Name
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -92,7 +124,7 @@ export default function WaitlistPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-lg">
-                Email
+                Email <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="email"
