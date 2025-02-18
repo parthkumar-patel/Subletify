@@ -24,7 +24,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f1d40] to-[#162a5a] p-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#0f1d40] to-[#162a5a] p-4">
       <Card className="w-full max-w-xl shadow-[0_0_50px_-12px_rgba(255,255,255,0.25)]">
         <CardHeader className="space-y-2">
           <CardTitle className="text-3xl font-bold text-center">Join Our Waitlist</CardTitle>
@@ -38,7 +38,7 @@ export default function WaitlistPage() {
               </Label>
               <div className="grid grid-cols-2 gap-8">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="relative w-40 h-40 transition-transform hover:scale-105 shadow-lg rounded-full overflow-hidden">
+                  <div className="relative w-24 h-24 md:w-40 md:h-40 transition-transform hover:scale-105 shadow-lg rounded-full overflow-hidden">
                     <Image
                       src={"/sublessee.jpeg"}
                       alt="Sublessor Mascot"
@@ -57,7 +57,7 @@ export default function WaitlistPage() {
                   </Toggle>
                 </div>
                 <div className="flex flex-col items-center gap-4">
-                  <div className="relative w-40 h-40 transition-transform hover:scale-105 shadow-lg rounded-full overflow-hidden">
+                  <div className="relative w-24 h-24 md:w-40 md:h-40 transition-transform hover:scale-105 shadow-lg rounded-full overflow-hidden">
                     <Image
                       src={"/sublessor.jpeg"}
                       alt="Sublessee Mascot"
