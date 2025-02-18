@@ -10,18 +10,22 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Toggle } from "@/components/ui/toggle"
 import { useToast } from "@/hooks/use-toast"
+import { databases, ID } from "./appwrite";
 
 export default function WaitlistPage() {
   const { toast } = useToast()
-  const [typeError, setTypeError] = useState(false)
   const [waitlistData, setWaitlistData] = useState({
     type: "",
     name: "",
     email: "",
   })
+  const [typeError, setTypeError] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
     if (!waitlistData.type) {
       setTypeError(true)
       toast({
@@ -30,26 +34,49 @@ export default function WaitlistPage() {
         duration: 5000,
         className: "bg-red-500 text-white",
       })
+      setIsSubmitting(false)
       return
     }
-    console.log("Submitted data:", waitlistData)
-    // Here you would typically send the data to your backend
 
-    // Show success notification
-    toast({
-      title: "Success!",
-      description: "Your details have been added to our waitlist.",
-      duration: 5000,
-      className: "bg-green-500 text-white",
-    })
+    try {
+      // Send data to Appwrite
+      const response = await databases.createDocument(
+        // (import.meta as any).env.NEXT_DATABASE_ID,
+        // (import.meta as any).env.NEXT_COLLECTION_ID,
+        '67b3c37c0023e8836e27',
+        '67b3c73b0005455fbeec',
+        ID.unique(),
+        waitlistData,
+      )
 
-    // Reset the form
-    setWaitlistData({
-      type: "",
-      name: "",
-      email: "",
-    })
-    setTypeError(false)
+      console.log("Submitted data:", response)
+
+      // Show success notification
+      toast({
+        title: "Success!",
+        description: "Your details have been added to our waitlist.",
+        duration: 5000,
+        className: "bg-green-500 text-white",
+      })
+
+      // Reset the form
+      setWaitlistData({
+        type: "",
+        name: "",
+        email: "",
+      })
+      setTypeError(false)
+    } catch (error) {
+      console.error("Error submitting to Appwrite:", error)
+      toast({
+        title: "Error",
+        description: "There was a problem adding you to the waitlist. Please try again.",
+        duration: 5000,
+        className: "bg-red-500 text-white",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -79,7 +106,10 @@ export default function WaitlistPage() {
                   </div>
                   <Toggle
                     pressed={waitlistData.type === "sublessee"}
-                    onPressedChange={() => {setWaitlistData({ ...waitlistData, type: "sublessee" }); setTypeError(false)}}
+                    onPressedChange={() => {
+                      setWaitlistData({ ...waitlistData, type: "sublessee" }); 
+                      setTypeError(false)
+                    }}
                     className={`data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md
                     ${typeError ? "border-red-500 border-2" : ""}`}
                   >
@@ -99,7 +129,10 @@ export default function WaitlistPage() {
                   </div>
                   <Toggle
                     pressed={waitlistData.type === "sublessor"}
-                    onPressedChange={() => {setWaitlistData({ ...waitlistData, type: "sublessor" }); setTypeError(false)}}
+                    onPressedChange={() => {
+                      setWaitlistData({ ...waitlistData, type: "sublessor" }); 
+                      setTypeError(false)
+                    }}
                     className={`data-[state=on]:bg-[#0f1d40] data-[state=on]:text-white text-lg px-6 py-2 shadow-md
                     ${typeError ? "border-red-500 border-2" : ""}`}
                   >
@@ -138,8 +171,12 @@ export default function WaitlistPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full bg-[#0f1d40] hover:bg-[#223974] text-lg py-5 shadow-md">
-              Join Waitlist
+            <Button
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-lg py-5 shadow-md"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Join Waitlist"}
             </Button>
           </CardFooter>
         </form>
